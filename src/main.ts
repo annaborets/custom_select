@@ -65,34 +65,39 @@ export class SelectComponent extends HTMLElement {
   private wrapper: HTMLDivElement;
   private selected: HTMLDivElement;
   private slotNodes: Node[];
-  private list: HTMLUListElement;
+  private list: HTMLElement;
   constructor() {
     super();
 
-    let shadow = this.attachShadow({ mode: "open" });
+    const shadow = this.attachShadow({ mode: "open" });
     shadow.appendChild(template.content.cloneNode(true));
-    this.wrapper = this.shadowRoot!.querySelector(".select") as HTMLDivElement;
 
-    this.list = this.shadowRoot!.querySelector(".list") as HTMLUListElement;
+    if (!this.shadowRoot) {
+      throw new Error("Shadow root is not open");
+    }
+
+    this.wrapper = this.shadowRoot.querySelector(".select") as HTMLDivElement;
+
+    this.list = this.shadowRoot.querySelector(".list") as HTMLElement;
 
     this.slotNodes = (
-      this.shadowRoot!.querySelector("slot") as HTMLSlotElement
+      this.shadowRoot.querySelector("slot") as HTMLSlotElement
     ).assignedNodes();
 
-    this.selected = this.shadowRoot!.querySelector(
+    this.selected = this.shadowRoot.querySelector(
       ".selected"
     ) as HTMLDivElement;
   }
 
   connectedCallback() {
-    this.selected!.innerText = (this.slotNodes[0] as HTMLLIElement).innerText;
+    this.selected.innerText = (this.slotNodes[0] as HTMLLIElement).innerText;
 
     this.selected.onclick = () => {
       this.wrapper.classList.toggle("closed");
     };
 
     this.list.onclick = (e) => {
-      this.selected!.innerText = (e.target as HTMLElement).innerText;
+      this.selected.innerText = (e.target as HTMLElement).innerText;
       this.wrapper.classList.add("closed");
     };
   }
